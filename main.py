@@ -3,56 +3,6 @@ pygame.M_1 = 323
 pygame.M_2 = 324
 pygame.M_3 = 325
 
-class config:
-	size = (500, 500)
-	background = (0, 0, 0)
-	title = "Test Game"
-	rate = 60
-	tilesize = 10
-	void = "V"
-	mouseoffset = (0, -5)
-	sky = "K"
-
-class controls:
-	up = pygame.K_w
-	down = pygame.K_s
-	left = pygame.K_a
-	right = pygame.K_d
-	dig = pygame.M_1
-	place = pygame.M_3
-
-	hb_1 = pygame.K_1
-	hb_2 = pygame.K_2
-	hb_3 = pygame.K_3
-	hb_4 = pygame.K_4
-
-class player:
-	movespeed = 1
-	holding = "S"
-	x = 200
-	y = 1000
-
-print "Loading textures..."
-unscaled_textures = {}
-textures = {}
-try: unscaled_textures["G"] = pygame.image.load("textures/grass-plains.png")
-except pygame.error: print "Missing texture 'G'"; unscaled_textures["G"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["V"] = pygame.image.load("textures/void.png")
-except pygame.error: print "Missing texture 'V'"; unscaled_textures["V"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["S"] = pygame.image.load("textures/stone.png")
-except pygame.error: print "Missing texture 'S'"; unscaled_textures["S"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["D"] = pygame.image.load("textures/dirt.png")
-except pygame.error: print "Missing texture 'D'"; unscaled_textures["D"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["E"] = pygame.image.load("textures/emerald.png")
-except pygame.error: print "Missing texture 'E'"; unscaled_textures["E"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["R"] = pygame.image.load("textures/ruby.png")
-except pygame.error: print "Missing texture 'R'"; unscaled_textures["R"] = pygame.image.load("textures/missing.png")
-try: unscaled_textures["K"] = pygame.image.load("textures/sky.png")
-except pygame.error: print "Missing texture 'K'"; unscaled_textures["K"] = pygame.image.load("textures/missing.png")
-for texture in unscaled_textures:
-	textures[texture] = pygame.transform.scale(unscaled_textures[texture], [config.tilesize]*2)
-
-print "Setting up..."
 def convert_coords(x, y):
 	offsetx = config.size[0]/2/config.tilesize
 	offsety = config.size[1]/2/config.tilesize
@@ -68,6 +18,12 @@ def revert_coords(x, y):
 	x = (x/config.tilesize)-(config.size[0]/2/config.tilesize)+player.x
 	y = ((config.size[1]-y)/config.tilesize)-(config.size[1]/2/config.tilesize)+player.y
 	return [x, y]
+
+def merge_dicts(*dict_args):
+    result = {}
+    for dictionary in dict_args:
+        result.update(dictionary)
+    return result
 
 def get_mouse_pos():
 	actual = pygame.mouse.get_pos()
@@ -116,6 +72,58 @@ def required_chunks():
 	top = cur + req + 1
 	return xrange(bot, top)
 
+class config:
+	size = (500, 500)
+	background = (0, 0, 0)
+	title = "Test Game"
+	rate = 60
+	tilesize = 10
+	void = "V"
+	mouseoffset = (0, -5)
+	sky = "K"
+
+class controls:
+	up = pygame.K_w
+	down = pygame.K_s
+	left = pygame.K_a
+	right = pygame.K_d
+	dig = pygame.M_1
+	place = pygame.M_3
+
+	hb_1 = pygame.K_1
+	hb_2 = pygame.K_2
+	hb_3 = pygame.K_3
+	hb_4 = pygame.K_4
+
+class player:
+	movespeed = 1
+	holding = "S"
+	x = 200
+	y = 1000
+
+print "Loading textures..."
+unscaled_textures = {}
+textures = {}
+try: unscaled_textures["G"] = pygame.image.load("textures/grass.png")
+except pygame.error: print "Missing texture 'G'"; unscaled_textures["G"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["V"] = pygame.image.load("textures/void.png")
+except pygame.error: print "Missing texture 'V'"; unscaled_textures["V"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["S"] = pygame.image.load("textures/stone.png")
+except pygame.error: print "Missing texture 'S'"; unscaled_textures["S"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["D"] = pygame.image.load("textures/dirt.png")
+except pygame.error: print "Missing texture 'D'"; unscaled_textures["D"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["E"] = pygame.image.load("textures/emerald.png")
+except pygame.error: print "Missing texture 'E'"; unscaled_textures["E"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["R"] = pygame.image.load("textures/ruby.png")
+except pygame.error: print "Missing texture 'R'"; unscaled_textures["R"] = pygame.image.load("textures/missing.png")
+try: unscaled_textures["K"] = pygame.image.load("textures/sky.png")
+except pygame.error: print "Missing texture 'K'"; unscaled_textures["K"] = pygame.image.load("textures/missing.png")
+
+for texture in unscaled_textures:
+	textures[texture] = pygame.transform.scale(unscaled_textures[texture], [config.tilesize]*2)
+
+
+
 class World:
 	def __init__(self, terrain, *args):
 		self.terrain = terrain
@@ -127,16 +135,16 @@ class World:
 			if not chunk in self.terrain.loaded:
 				self.terrain.load_chunk(chunk)
 
-	def draw_chunk(self, chunk, yrange):
-		for point in chunk:
-
 	def draw_terrain(self, screen):
 		to_draw = extract_chunks(self.terrain.chunks)
-		dist_updown = config.size[1]/2/config.tilesize
-		y_range = xrange(player.y - dist_updown, player.y + dist_updown)
+		print to_draw
+		merged = merge_dicts(*to_draw.values())
 
-		for chunk in to_draw:
-			draw_chunk(self.terrain.chunk[chunk], y_range)
+		for tile in merged:
+			converted = convert_coords(*tile)
+			image = textures[merged[tile]]
+			screen.blit(image, converted)
+		print converted
 
 	def draw_objects(self, screen):
 		for obj in self.objects:
