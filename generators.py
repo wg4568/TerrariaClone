@@ -46,3 +46,15 @@ def basic_hills(x, height, seed):
 			else:
 				chunk[x, y] = "S"
 	return chunk
+
+def flat(x, height, seed):
+	cs = x * 10
+	xr = xrange(cs, cs+10)
+	chunk = {}
+	for x in xr:
+		for y in xrange(height):
+			if y >= 400:
+				chunk[x, y] = "K"
+			else:
+				chunk[x, y] = "S"
+	return chunk

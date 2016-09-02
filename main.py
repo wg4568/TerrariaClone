@@ -66,11 +66,11 @@ def current_chunk():
 
 def required_chunks():
 	off = config.size[0]/2/config.tilesize
-	req = int(math.ceil(off/10.))
+	dist = int(math.floor(off/10.))
 	cur = current_chunk()
-	bot = cur - req
-	top = cur + req + 1
-	return xrange(bot, top)
+	bot = cur - dist + 5
+	top = cur + dist + 5
+	return xrange(bot, top+1)
 
 class config:
 	size = (500, 500)
@@ -98,8 +98,8 @@ class controls:
 class player:
 	movespeed = 1
 	holding = "S"
-	x = 200
-	y = 1000
+	x = 1000
+	y = 200
 
 print "Loading textures..."
 unscaled_textures = {}
@@ -137,14 +137,12 @@ class World:
 
 	def draw_terrain(self, screen):
 		to_draw = extract_chunks(self.terrain.chunks)
-		print to_draw
 		merged = merge_dicts(*to_draw.values())
 
 		for tile in merged:
 			converted = convert_coords(*tile)
 			image = textures[merged[tile]]
 			screen.blit(image, converted)
-		print converted
 
 	def draw_objects(self, screen):
 		for obj in self.objects:
@@ -214,3 +212,6 @@ terra.set_generator(generators.basic_hills)
 world = World(terra)
 game = Game(world)
 game.start()
+
+#print game.world.terrain.chunks
+#print convert_coords(player.x, player.y)
